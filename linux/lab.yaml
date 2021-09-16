@@ -1,0 +1,56 @@
+---
+- name: Understanding templates
+  hosts: servers
+  gather_facts: yes
+
+  tasks:
+    - name: clean up the directory if its exists
+      file:
+        path: reports
+        state: absent
+      delegate_to: localhost
+      run_once: yes
+
+    - name: create the directory
+      file:
+        path: reports
+        state: directory
+      delegate_to: localhost
+      run_once: yes
+
+    - name: render facts as report
+      template:
+          src: ./templates/ansible_facts.j2
+          dest: ./reports/ansible_facts_{{ inventory_hostname }}.csv
+      delegate_to: localhost
+
+    - name: consolidate the final report
+      assemble:
+          src: ./reports/
+          dest: ./reports/consolidated_facts_report.csv
+      run_once: yes
+      delegate_to: localhost
+
+    - name: inserting csv header
+      lineinfile:
+          path: ./reports/consolidated_facts_report.csv
+          line: Processor, Nodename, OS_Family, Ansible Machine, Distribution, Selinux Status
+          insertbefore: BOF
+      delegate_to: localhost
+      run_once: yes
+
+    - name: Sending the report via mail
+      mail:
+        host: smtp.gmail.com
+        subtype: html
+        port: 587
+        password: #your password
+        to: rajthecomputerguy@gmail.com
+        from: rajthecomputerguy@gmail.com
+        username: rajthecomputerguy@gmail.com
+        subject: "LINUX SERVER - OS REPORT"
+        body: "Please find the attached OS report"
+        attach:
+           - ./reports/consolidated_facts_report.csv
+      delegate_to: localhost
+      run_once: yes
