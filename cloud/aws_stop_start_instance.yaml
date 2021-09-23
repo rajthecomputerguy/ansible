@@ -1,0 +1,43 @@
+---
+- name: Stop and start the AWS Instance
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars:
+    instance_ids:
+      - 'i-01fe9c5f52567e380'
+      - 'i-09797e5fc180e7a00'
+      - 'i-04a21cb45746ea557'
+    region: us-east-2
+
+  tasks:
+    - name: Stopping the Ansible lab instances
+      ec2:
+        instance_ids: '{{ instance_ids }}'
+        aws_access_key: '***********************'
+        aws_secret_key: '***********************'
+        region: '{{ region }}'
+        state: stopped
+        wait: True
+        vpc_subnet_id: subnet-28406364
+        assign_public_ip: yes
+      when: ACTION == 'stop'
+
+
+    - name: Starting the Ansible lab instances
+      ec2:
+        instance_ids: '{{ instance_ids }}'
+        aws_access_key: '*********************'
+        aws_secret_key: '*********************'
+        region: '{{ region }}'
+        state: running
+        wait: True
+        vpc_subnet_id: subnet-28406364
+        assign_public_ip: yes
+      when: ACTION == 'start'
+      register: pubip
+
+    - name: getting the public ip
+      debug:
+        msg: "The public ip of the {{ pubip['instances'][0]['tags']['Name'] }} is {{ pubip['instances'][0]['public_ip'] }}"
+      when: ACTION == 'start'
