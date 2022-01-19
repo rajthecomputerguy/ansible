@@ -1,0 +1,11 @@
+create .sh file has following lines
+
+＃！／bin/sh
+
+cd/home/username/projects
+
+ansible-playbook network_usage_status.yaml
+
+sudo crontab -e
+
+＊／1＊＊＊＊ source/home/username/projects/network_usage. sh
