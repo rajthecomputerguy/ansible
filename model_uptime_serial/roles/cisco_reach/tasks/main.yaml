@@ -1,0 +1,158 @@
+name: running show version
+cli_command:
+command: sh ver
+register: current_config
+ignore_errors: yes
+name: getting uptime from show version
+I
+cli_command:
+comand: sh ver | include uptime
+register: uptime_data
+ignore_errors: yes
+set_fact:
+uptime: "{{ uptime_data.stdout.split(`,')[ø].split()[3:] | join(' ') }}"
+delegate_to: localhost
+when:
+－＂current_config.msg is undefined"
+－＂＇Cisco IOS'in current_config. stdout"
+set_fact:
+uptime:"{{ uptime_data.stdout.split(,')[ø].split()[3:]| join(') }}"
+delegate_to:localhost
+ignore_errors: yes
+when:
+－＂current_config.msg is undefined"
+－＂＇Cisco Nexus' in current_config. stdout"
+name: gathering the nxos_facts
+nxos_facts:
+ignore errors: yes
+register: nxosfacts
+when:"'Cisco Nxus'in current_config.stdout"
+ios_facts:
+ignore_errors:yes
+register: iosfacts
+when:"'Cisco IOS' in current_config. stdout or 'Cisco Internetwork' in current_config.stdout"
+set fact:
+device_status: "{{ current_config['msg'] }}"
+when:current_config.msg is defined
+delegate_to: localhost
+ignore_errors: yes
+N/A portion
+name: capturing login results
+set_fact:
+delegate_to: localhost
+login_status: "{{ 'Failed' if current_config.failed == true else 'Passed'}}"
+ignore_errors:yes
+set_fact:
+device_status:“N/A”
+when: current_config['msg'] is undefined
+delegate_to:localhost
+ignore_errors:yes
+set_fact:
+ansible_net_version:"N/A”
+when: "iosfacts.exception is defined or nxosfacts.exception is defined or iosfacts.failed == true or nxosfacts.failed == true"
+delegate_to:localhost
+ignore_errors: yes
+set_fact:
+uptime:"N/A"
+I
+when:current_config.msg is defined
+delegate_to:localhost
+ignore_errors: yes
+set_fact:
+ansible_net_image:"N/A"
+when: "iosfacts.exception is defined or nxosfacts.exception is defined or iosfacts.failed == true or nxosfacts.failed == true"
+delegate_to:localhost
+ignore_errors:yes
+set_fact:
+ansible_net_serialnum:"N/A".
+when: "iosfacts.exception is defined or nxosfacts.exception is defined or iosfacts. failed == true or nxosfacts.failed == true"
+delegate_to:localhost
+ignore_errors:yes
+set_fact:
+ansible_net_model:"N/A"
+when:"iosfacts.exception is defined or nxosfacts.exception is defined or iosfacts.failed == true or nxosfacts.failed == true"
+delegate_to: localhost
+ignore_errors: yes
+set_fact:
+ansible_net_hostname:"N/A"
+when: "iosfacts.exception is defined or nxosfacts. exception is defined or iosfacts. failed == true or nxosfacts.failed == true"
+delegate_to:localhost
+ignore_errors:yes
+set_fact:
+network_os:"N/A"
+when: current_config.failed == true
+delegate_to: localhost
+ignore_errors: yes
+＃ N/A set fact end
+＃＃ setting os type start
+
+＃＃ setting os type start
+－set_fact:
+network_os: "NXOS"
+delegate_to: localhost
+ignore_errors: yes
+when:
+－ " 'Cisco  Nexus' in current_config. stdout"
+－set_fact:
+network_os: "IOS"
+delegate_to: localhost
+ignore_errors: yes
+when:
+－ "'Cisco IOS' in current_config. stdout"
+＃＃ setting os type end
+
+＃ Report
+name:Clean Up Reports Directory if it exists
+file:
+path:reports_smart
+state: absent
+mode:0755
+delegate_to:localhost
+run_once:yes
+ignore_errors:yes
+I
+name: Create Reports Directory
+file:
+path: reports_smart
+state: directory
+mode:0755
+delegate_to: localhost
+run_once:yes
+ignore_errors:yes
+name:Render Facts as Report
+template:
+src:individual_cisco_report.html.j2
+dest:"reports_smart/interim_report_{{ inventory_hostname }}.csv"
+ignore_errors: yes
+delegate_to: localhost
+－
+name:Consolidate Final Report
+assemble:
+src:reports_smart/
+dest: reports_smart/Consolidated_Cisco_Report. csv
+delegate_to: localhost
+run_once:yes
+ignore_errors:yes
+name: csv header
+lineinfile:
+path: reports_smart/Consolidated_Cisco_Report.csv
+line: "Date and Time,IP Address,Hostname,OS,Login Status, Device Status, version, uptime, bin_file,Serial Number,Model"
+insertbefore: BOF
+delegate_to:localhost
+run_once:yes
+ignore_errors:yes
+
+name:Send Email with Report
+－
+mail:-
+host:"{{ smtp_server }}”
+port:"{{ smtp_port }}”
+to:"{{ to_id }}”－
+from:"{{ from_id }}”
+subject: Report For Cisco devices
+body:"The consolidated Cisco Devices can be found in the attached file"
+attach:
+－＂reports smart/Consolidated Cisco Report.csv"
+delegate_to:localhost
+run_once:yes
+ignore_errors:yes

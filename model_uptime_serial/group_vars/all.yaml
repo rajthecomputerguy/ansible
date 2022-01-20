@@ -1,0 +1,6 @@
+---
+ansible_command_timeout: 1000
+to_id:
+from_id:
+smtp_port:
+smtp_server:
