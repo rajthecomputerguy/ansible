@@ -1,0 +1,10 @@
+- name: multiple commands
+  commands: "{{ item }}"
+  with_items: 
+     - ls -ltr /tmp
+     - df -h
+     - uptime
+  register: reg_out
+  
+  - debug:
+      msg: "{{ reg_out.results | map (attribute='stdout_lines) | list }}"
