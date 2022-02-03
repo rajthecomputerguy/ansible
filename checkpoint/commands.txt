@@ -1,0 +1,9 @@
+fw ver
+fw stat
+uname -a 
+cphaprob -a if
+cphaprob -l list
+cphaprob stat
+vsx stat -v
+show route
+show configuration
