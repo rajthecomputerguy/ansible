@@ -1,0 +1,5 @@
+import re
+
+a = "Enter vrf (If no input, current vrf 'default' is considered):"
+re.escape(a)
+"Enter\\ vrf\\ \\(If\\ no\\ input\\,\\ current\\ vrf\\ \\'default\\'\\ is\\ considered\\)\\:"
